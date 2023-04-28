@@ -15,26 +15,47 @@ for (let i = 0; i < cols; i++) {
 }
 
 class Enemy {
-    constructor(posX, posY) {
+    constructor(row, col) {
         this.HP = 100;
         this.ATK = 10;
-        this.posX = posX;
-        this.posY = posY;
+        this.row = row;
+        this.col = col;
 
-        $(`.tileE[data-row=${this.posX}][data-col=${this.posY}]`).html(
+        $(`.tileE[data-row=${this.row}][data-col=${this.col}]`).html(
             `<div class="health" style="width: ${this.HP}%;">`
         );
     }
+
+    // attack() {
+    //     const enemyTilesAround = [
+    //         $(`.tile[data-row=${this.posX - 1}][data-col=${this.p}]`),
+    //         $(
+    //             `.tile[data-row=${
+    //                 currentPosRow + 1
+    //             }][data-col=${currentPosCol}]`
+    //         ),
+    //         $(
+    //             `.tile[data-row=${currentPosRow}][data-col=${
+    //                 currentPosCol + 1
+    //             }]`
+    //         ),
+    //         $(
+    //             `.tile[data-row=${currentPosRow}][data-col=${
+    //                 currentPosCol - 1
+    //             }]`
+    //         ),
+    //     ];
+    // }
 }
 
 class Hero {
-    constructor(posX, posY) {
+    constructor(row, col) {
         this.HP = 100;
         this.ATK = 20;
-        this.posX = posX;
-        this.posY = posY;
+        this.row = row;
+        this.col = col;
 
-        $(`.tileP[data-row=${this.posX}][data-col=${this.posY}]`).html(
+        $(`.tileP[data-row=${this.row}][data-col=${this.col}]`).html(
             `<div class="health" style="width: ${this.HP}%;">`
         );
     }
@@ -65,12 +86,10 @@ class Hero {
 
         heroTilesAround.forEach((tile) => {
             if ($(tile).hasClass('tileE')) {
-                const posX = $(tile).data('row');
-                const posY = $(tile).data('col');
+                const row = $(tile).data('row');
+                const col = $(tile).data('col');
 
-                const enemy = enemies.find(
-                    (e) => e.posX == posX && e.posY == posY
-                );
+                const enemy = enemies.find((e) => e.row == row && e.col == col);
 
                 enemy.HP = enemy.HP - player.ATK;
                 if (enemy.HP == 0) $(tile).removeClass('tileE');
@@ -113,6 +132,8 @@ class Game {
         placeObject('health');
         placeObject('hero');
         placeObject('enemies');
+
+        console.log(enemies);
 
         $(document).keydown((e) => {
             const currentPosCol = $('.tileP').data('col');
