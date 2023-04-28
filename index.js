@@ -12,6 +12,14 @@ for (let i = 0; i < cols; i++) {
 }
 
 class Game {
+    constructor() {
+        this.heroHP = 100;
+        this.heroATK = 20;
+
+        this.enemyHP = 100;
+        this.enemyATK = 10;
+    }
+
     init() {
         $('.field').empty();
 
@@ -38,7 +46,9 @@ class Game {
         $(document).keydown((e) => {
             const currentPosCol = $('.tileP').data('col');
             const currentPosRow = $('.tileP').data('row');
+            const hero = $('.tileP');
             let newPos;
+            let newPosTile;
 
             switch (e.code) {
                 case 'KeyW':
@@ -46,7 +56,10 @@ class Game {
                     if (
                         $(
                             `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
-                        ).hasClass('tileW')
+                        ).hasClass('tileW') ||
+                        $(
+                            `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
+                        ).hasClass('tileE')
                     ) {
                         return false;
                     }
@@ -55,11 +68,19 @@ class Game {
                         return false;
                     }
 
-                    $('.tileP').removeClass('tileP');
+                    $(hero).empty();
 
-                    $(
+                    $(hero).removeClass('tileP');
+
+                    newPosTile = $(
                         `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
-                    ).addClass('tileP');
+                    );
+
+                    $(newPosTile).addClass('tileP');
+
+                    $(newPosTile).html(
+                        `<div class="health" style="width: ${this.heroHP}%;">`
+                    );
 
                     break;
                 case 'KeyA':
@@ -67,7 +88,10 @@ class Game {
                     if (
                         $(
                             `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
-                        ).hasClass('tileW')
+                        ).hasClass('tileW') ||
+                        $(
+                            `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
+                        ).hasClass('tileE')
                     ) {
                         return false;
                     }
@@ -76,11 +100,18 @@ class Game {
                         return false;
                     }
 
-                    $('.tileP').removeClass('tileP');
+                    $(hero).empty();
 
-                    $(
+                    $(hero).removeClass('tileP');
+
+                    newPosTile = $(
                         `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
-                    ).addClass('tileP');
+                    );
+
+                    $(newPosTile).addClass('tileP');
+                    $(newPosTile).html(
+                        `<div class="health" style="width: ${this.heroHP}%;">`
+                    );
 
                     break;
                 case 'KeyS':
@@ -88,7 +119,10 @@ class Game {
                     if (
                         $(
                             `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
-                        ).hasClass('tileW')
+                        ).hasClass('tileW') ||
+                        $(
+                            `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
+                        ).hasClass('tileE')
                     ) {
                         return false;
                     }
@@ -97,11 +131,18 @@ class Game {
                         return false;
                     }
 
-                    $('.tileP').removeClass('tileP');
+                    $(hero).empty();
 
-                    $(
+                    $(hero).removeClass('tileP');
+
+                    newPosTile = $(
                         `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
-                    ).addClass('tileP');
+                    );
+
+                    $(newPosTile).addClass('tileP');
+                    $(newPosTile).html(
+                        `<div class="health" style="width: ${this.heroHP}%;">`
+                    );
 
                     break;
                 case 'KeyD':
@@ -109,7 +150,10 @@ class Game {
                     if (
                         $(
                             `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
-                        ).hasClass('tileW')
+                        ).hasClass('tileW') ||
+                        $(
+                            `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
+                        ).hasClass('tileE')
                     ) {
                         return false;
                     }
@@ -118,11 +162,18 @@ class Game {
                         return false;
                     }
 
-                    $('.tileP').removeClass('tileP');
+                    $(hero).empty();
 
-                    $(
+                    $(hero).removeClass('tileP');
+
+                    newPosTile = $(
                         `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
-                    ).addClass('tileP');
+                    );
+
+                    $(newPosTile).addClass('tileP');
+                    $(newPosTile).html(
+                        `<div class="health" style="width: ${this.heroHP}%;">`
+                    );
 
                     break;
                 case 'Space':
@@ -182,10 +233,11 @@ const createPasses = (type) => {
     }
 };
 
-const placeObject = (type) => {
+const placeObject = (type, stats = null) => {
     let emptyTiles = [];
     let count = 0;
     let className = '';
+    let html = '';
 
     switch (type) {
         case 'health':
@@ -202,6 +254,9 @@ const placeObject = (type) => {
             emptyTiles = $('.tile').not('.tileW').not('.tileSW').not('.tileHP');
             count = 1;
             className = 'tileP';
+
+            html = `<div class="health" style="width: ${100}%;">`;
+
             break;
         case 'enemies':
             emptyTiles = $('.tile')
@@ -211,6 +266,8 @@ const placeObject = (type) => {
                 .not('.tileP');
             count = 10;
             className = 'tileE';
+            html = `<div class="health" style="width: ${100}%;">`;
+
             break;
     }
 
@@ -227,6 +284,7 @@ const placeObject = (type) => {
     }
 
     for (let index of emptyTilesIndexes) {
-        emptyTiles[index].classList.add(className);
+        $(emptyTiles[index]).addClass(className);
+        $(emptyTiles[index]).html(html);
     }
 };
