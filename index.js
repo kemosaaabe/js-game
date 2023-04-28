@@ -86,7 +86,8 @@ class Enemy {
                 way.data('col') < cols &&
                 way.data('row') < rows &&
                 !way.hasClass('tileW') &&
-                !way.hasClass('tileE')
+                !way.hasClass('tileE') &&
+                !way.hasClass('tileP')
         );
 
         if (!randomWays.length) return;
