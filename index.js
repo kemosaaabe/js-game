@@ -33,7 +33,6 @@ class Enemy {
 
     observe() {
         this.playerIsNear = false;
-        console.log(this.playerIsNear);
         const enemyTilesAround = [
             $(`.tile[data-row=${this.row - 1}][data-col=${this.col}]`),
             $(`.tile[data-row=${this.row + 1}][data-col=${this.col}]`),
@@ -47,7 +46,7 @@ class Enemy {
     }
 
     attack() {
-        if (!this.HP) return;
+        if (this.HP <= 0) return;
         const enemyTilesAround = [
             $(`.tile[data-row=${this.row - 1}][data-col=${this.col}]`),
             $(`.tile[data-row=${this.row + 1}][data-col=${this.col}]`),
@@ -66,7 +65,7 @@ class Enemy {
     }
 
     move() {
-        if (!this.HP) return;
+        if (this.HP <= 0) return;
         if (this.playerIsNear) return;
 
         const enemyTile = $(
@@ -111,9 +110,12 @@ class Enemy {
 }
 
 class Hero {
+    static HeroHP = 100;
+    static HeroATK = 20;
+
     constructor(row, col) {
-        this.HP = 100;
-        this.ATK = 20;
+        this.HP = Hero.HeroHP;
+        this.ATK = Hero.HeroATK;
         this.row = row;
         this.col = col;
 
@@ -156,7 +158,7 @@ class Hero {
                 const enemy = enemies.find((e) => e.row == row && e.col == col);
 
                 enemy.HP = enemy.HP - player.ATK;
-                if (enemy.HP == 0) {
+                if (enemy.HP <= 0) {
                     $(tile).removeClass('tileE');
                 }
 
@@ -170,6 +172,19 @@ class Hero {
         $(heroTile).empty();
 
         $(heroTile).removeClass('tileP');
+
+        if (newPosTile.hasClass('tileHP')) {
+            if (player.HP != Hero.HeroHP) {
+                player.HP += 20;
+
+                newPosTile.removeClass('tileHP');
+            }
+        }
+
+        if (newPosTile.hasClass('tileSW')) {
+            player.ATK += 10;
+            newPosTile.removeClass('tileSW');
+        }
 
         $(newPosTile).addClass('tileP');
 
@@ -199,10 +214,6 @@ class Game {
         placeObject('health');
         placeObject('hero');
         placeObject('enemies');
-
-        // console.log(
-        //     $(`.tileE[data-row=${enemies[0].row}][data-col=${enemies[0].col}]`)
-        // );
 
         $(document).keydown((e) => {
             const currentPosCol = player.col;
