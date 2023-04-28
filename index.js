@@ -20,12 +20,30 @@ class Enemy {
         this.ATK = 20;
         this.row = row;
         this.col = col;
+        this.playerIsNear = false;
 
         $(`.tileE[data-row=${this.row}][data-col=${this.col}]`).html(
             `<div class="health" style="width: ${this.HP}%;">`
         );
 
+        setInterval(() => this.observe(), 100);
         setInterval(() => this.attack(), 1000);
+        setInterval(() => this.move(), 1000);
+    }
+
+    observe() {
+        this.playerIsNear = false;
+        console.log(this.playerIsNear);
+        const enemyTilesAround = [
+            $(`.tile[data-row=${this.row - 1}][data-col=${this.col}]`),
+            $(`.tile[data-row=${this.row + 1}][data-col=${this.col}]`),
+            $(`.tile[data-row=${this.row}][data-col=${this.col + 1}]`),
+            $(`.tile[data-row=${this.row}][data-col=${this.col - 1}]`),
+        ];
+
+        enemyTilesAround.some((tile) => {
+            if (tile.hasClass('tileP')) this.playerIsNear = true;
+        });
     }
 
     attack() {
@@ -47,7 +65,49 @@ class Enemy {
         });
     }
 
-    move() {}
+    move() {
+        if (!this.HP) return;
+        if (this.playerIsNear) return;
+
+        const enemyTile = $(
+            `.tileE[data-row=${this.row}][data-col=${this.col}]`
+        );
+
+        let randomWays = [
+            $(`.tile[data-row=${this.row - 1}][data-col=${this.col}]`),
+            $(`.tile[data-row=${this.row + 1}][data-col=${this.col}]`),
+            $(`.tile[data-row=${this.row}][data-col=${this.col - 1}]`),
+            $(`.tile[data-row=${this.row}][data-col=${this.col + 1}]`),
+        ];
+
+        randomWays = randomWays.filter(
+            (way) =>
+                way.data('col') >= 0 &&
+                way.data('row') >= 0 &&
+                way.data('col') < cols &&
+                way.data('row') < rows &&
+                !way.hasClass('tileW') &&
+                !way.hasClass('tileE')
+        );
+
+        if (!randomWays.length) return;
+
+        const randomWayTile =
+            randomWays[Math.floor(Math.random() * randomWays.length)];
+
+        $(enemyTile).empty();
+
+        $(enemyTile).removeClass('tileE');
+
+        $(randomWayTile).addClass('tileE');
+
+        this.col = $(randomWayTile).data('col');
+        this.row = $(randomWayTile).data('row');
+
+        $(randomWayTile).html(
+            `<div class="health" style="width: ${this.HP}%;">`
+        );
+    }
 }
 
 class Hero {
@@ -139,6 +199,10 @@ class Game {
         placeObject('health');
         placeObject('hero');
         placeObject('enemies');
+
+        // console.log(
+        //     $(`.tileE[data-row=${enemies[0].row}][data-col=${enemies[0].col}]`)
+        // );
 
         $(document).keydown((e) => {
             const currentPosCol = player.col;
