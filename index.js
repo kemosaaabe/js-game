@@ -1,6 +1,9 @@
 const rows = 13;
 const cols = 20;
 
+const enemies = [];
+let player;
+
 const rowsArray = [];
 for (let i = 0; i < rows; i++) {
     rowsArray.push(i);
@@ -11,15 +14,84 @@ for (let i = 0; i < cols; i++) {
     colsArray.push(i);
 }
 
-class Game {
-    constructor() {
-        this.heroHP = 100;
-        this.heroATK = 20;
+class Enemy {
+    constructor(posX, posY) {
+        this.HP = 100;
+        this.ATK = 10;
+        this.posX = posX;
+        this.posY = posY;
 
-        this.enemyHP = 100;
-        this.enemyATK = 10;
+        $(`.tileE[data-row=${this.posX}][data-col=${this.posY}]`).html(
+            `<div class="health" style="width: ${this.HP}%;">`
+        );
+    }
+}
+
+class Hero {
+    constructor(posX, posY) {
+        this.HP = 100;
+        this.ATK = 20;
+        this.posX = posX;
+        this.posY = posY;
+
+        $(`.tileP[data-row=${this.posX}][data-col=${this.posY}]`).html(
+            `<div class="health" style="width: ${this.HP}%;">`
+        );
     }
 
+    attack(currentPosCol, currentPosRow) {
+        const heroTilesAround = [
+            $(
+                `.tile[data-row=${
+                    currentPosRow - 1
+                }][data-col=${currentPosCol}]`
+            ),
+            $(
+                `.tile[data-row=${
+                    currentPosRow + 1
+                }][data-col=${currentPosCol}]`
+            ),
+            $(
+                `.tile[data-row=${currentPosRow}][data-col=${
+                    currentPosCol + 1
+                }]`
+            ),
+            $(
+                `.tile[data-row=${currentPosRow}][data-col=${
+                    currentPosCol - 1
+                }]`
+            ),
+        ];
+
+        heroTilesAround.forEach((tile) => {
+            if ($(tile).hasClass('tileE')) {
+                const posX = $(tile).data('row');
+                const posY = $(tile).data('col');
+
+                const enemy = enemies.find(
+                    (e) => e.posX == posX && e.posY == posY
+                );
+
+                enemy.HP = enemy.HP - player.ATK;
+                if (enemy.HP == 0) $(tile).removeClass('tileE');
+
+                $(tile).children('.health').css('width', `${enemy.HP}%`);
+            }
+        });
+    }
+
+    move(heroTile, newPosTile) {
+        $(heroTile).empty();
+
+        $(heroTile).removeClass('tileP');
+
+        $(newPosTile).addClass('tileP');
+
+        $(newPosTile).html(`<div class="health" style="width: ${this.HP}%;">`);
+    }
+}
+
+class Game {
     init() {
         $('.field').empty();
 
@@ -34,7 +106,6 @@ class Game {
                 );
             }
         }
-
         createRoom();
         createPasses('col');
         createPasses('row');
@@ -68,19 +139,11 @@ class Game {
                         return false;
                     }
 
-                    $(hero).empty();
-
-                    $(hero).removeClass('tileP');
-
                     newPosTile = $(
                         `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
                     );
 
-                    $(newPosTile).addClass('tileP');
-
-                    $(newPosTile).html(
-                        `<div class="health" style="width: ${this.heroHP}%;">`
-                    );
+                    player.move(hero, newPosTile);
 
                     break;
                 case 'KeyA':
@@ -100,18 +163,11 @@ class Game {
                         return false;
                     }
 
-                    $(hero).empty();
-
-                    $(hero).removeClass('tileP');
-
                     newPosTile = $(
                         `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
                     );
 
-                    $(newPosTile).addClass('tileP');
-                    $(newPosTile).html(
-                        `<div class="health" style="width: ${this.heroHP}%;">`
-                    );
+                    player.move(hero, newPosTile);
 
                     break;
                 case 'KeyS':
@@ -131,18 +187,11 @@ class Game {
                         return false;
                     }
 
-                    $(hero).empty();
-
-                    $(hero).removeClass('tileP');
-
                     newPosTile = $(
                         `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
                     );
 
-                    $(newPosTile).addClass('tileP');
-                    $(newPosTile).html(
-                        `<div class="health" style="width: ${this.heroHP}%;">`
-                    );
+                    player.move(hero, newPosTile);
 
                     break;
                 case 'KeyD':
@@ -162,22 +211,16 @@ class Game {
                         return false;
                     }
 
-                    $(hero).empty();
-
-                    $(hero).removeClass('tileP');
-
                     newPosTile = $(
                         `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
                     );
 
-                    $(newPosTile).addClass('tileP');
-                    $(newPosTile).html(
-                        `<div class="health" style="width: ${this.heroHP}%;">`
-                    );
+                    player.move(hero, newPosTile);
 
                     break;
                 case 'Space':
                     e.preventDefault();
+                    player.attack(currentPosCol, currentPosRow);
             }
         });
     }
@@ -233,11 +276,10 @@ const createPasses = (type) => {
     }
 };
 
-const placeObject = (type, stats = null) => {
+const placeObject = (type) => {
     let emptyTiles = [];
     let count = 0;
     let className = '';
-    let html = '';
 
     switch (type) {
         case 'health':
@@ -255,8 +297,6 @@ const placeObject = (type, stats = null) => {
             count = 1;
             className = 'tileP';
 
-            html = `<div class="health" style="width: ${100}%;">`;
-
             break;
         case 'enemies':
             emptyTiles = $('.tile')
@@ -266,7 +306,6 @@ const placeObject = (type, stats = null) => {
                 .not('.tileP');
             count = 10;
             className = 'tileE';
-            html = `<div class="health" style="width: ${100}%;">`;
 
             break;
     }
@@ -285,6 +324,23 @@ const placeObject = (type, stats = null) => {
 
     for (let index of emptyTilesIndexes) {
         $(emptyTiles[index]).addClass(className);
-        $(emptyTiles[index]).html(html);
+
+        switch (type) {
+            case 'enemies':
+                enemies.push(
+                    new Enemy(
+                        $(emptyTiles[index]).data('row'),
+                        $(emptyTiles[index]).data('col')
+                    )
+                );
+                break;
+
+            case 'hero':
+                player = new Hero(
+                    $(emptyTiles[index]).data('row'),
+                    $(emptyTiles[index]).data('col')
+                );
+                break;
+        }
     }
 };
