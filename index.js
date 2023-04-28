@@ -17,7 +17,7 @@ for (let i = 0; i < cols; i++) {
 class Enemy {
     constructor(row, col) {
         this.HP = 100;
-        this.ATK = 20;
+        this.ATK = 25;
         this.row = row;
         this.col = col;
         this.playerIsNear = false;
@@ -27,7 +27,7 @@ class Enemy {
         );
 
         setInterval(() => this.observe(), 100);
-        setInterval(() => this.attack(), 1000);
+        setInterval(() => this.attack(), 800);
         setInterval(() => this.move(), 1000);
     }
 
@@ -57,7 +57,7 @@ class Enemy {
         enemyTilesAround.forEach((tile) => {
             if ($(tile).hasClass('tileP')) {
                 player.HP = player.HP - this.ATK;
-                if (player.HP == 0) $(tile).removeClass('tileP');
+                if (player.HP <= 0) $(tile).removeClass('tileP');
 
                 $(tile).children('.health').css('width', `${player.HP}%`);
             }
@@ -178,6 +178,10 @@ class Hero {
                 player.HP += 20;
 
                 newPosTile.removeClass('tileHP');
+            }
+
+            if (player.HP > Hero.HeroHP) {
+                player.HP = Hero.HeroHP;
             }
         }
 
