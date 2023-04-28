@@ -17,35 +17,37 @@ for (let i = 0; i < cols; i++) {
 class Enemy {
     constructor(row, col) {
         this.HP = 100;
-        this.ATK = 10;
+        this.ATK = 20;
         this.row = row;
         this.col = col;
 
         $(`.tileE[data-row=${this.row}][data-col=${this.col}]`).html(
             `<div class="health" style="width: ${this.HP}%;">`
         );
+
+        setInterval(() => this.attack(), 1000);
     }
 
-    // attack() {
-    //     const enemyTilesAround = [
-    //         $(`.tile[data-row=${this.posX - 1}][data-col=${this.p}]`),
-    //         $(
-    //             `.tile[data-row=${
-    //                 currentPosRow + 1
-    //             }][data-col=${currentPosCol}]`
-    //         ),
-    //         $(
-    //             `.tile[data-row=${currentPosRow}][data-col=${
-    //                 currentPosCol + 1
-    //             }]`
-    //         ),
-    //         $(
-    //             `.tile[data-row=${currentPosRow}][data-col=${
-    //                 currentPosCol - 1
-    //             }]`
-    //         ),
-    //     ];
-    // }
+    attack() {
+        if (!this.HP) return;
+        const enemyTilesAround = [
+            $(`.tile[data-row=${this.row - 1}][data-col=${this.col}]`),
+            $(`.tile[data-row=${this.row + 1}][data-col=${this.col}]`),
+            $(`.tile[data-row=${this.row}][data-col=${this.col + 1}]`),
+            $(`.tile[data-row=${this.row}][data-col=${this.col - 1}]`),
+        ];
+
+        enemyTilesAround.forEach((tile) => {
+            if ($(tile).hasClass('tileP')) {
+                player.HP = player.HP - this.ATK;
+                if (player.HP == 0) $(tile).removeClass('tileP');
+
+                $(tile).children('.health').css('width', `${player.HP}%`);
+            }
+        });
+    }
+
+    move() {}
 }
 
 class Hero {
@@ -61,6 +63,8 @@ class Hero {
     }
 
     attack(currentPosCol, currentPosRow) {
+        if (!this.HP) return;
+
         const heroTilesAround = [
             $(
                 `.tile[data-row=${
@@ -92,7 +96,9 @@ class Hero {
                 const enemy = enemies.find((e) => e.row == row && e.col == col);
 
                 enemy.HP = enemy.HP - player.ATK;
-                if (enemy.HP == 0) $(tile).removeClass('tileE');
+                if (enemy.HP == 0) {
+                    $(tile).removeClass('tileE');
+                }
 
                 $(tile).children('.health').css('width', `${enemy.HP}%`);
             }
@@ -100,6 +106,7 @@ class Hero {
     }
 
     move(heroTile, newPosTile) {
+        if (!this.HP) return;
         $(heroTile).empty();
 
         $(heroTile).removeClass('tileP');
@@ -133,11 +140,9 @@ class Game {
         placeObject('hero');
         placeObject('enemies');
 
-        console.log(enemies);
-
         $(document).keydown((e) => {
-            const currentPosCol = $('.tileP').data('col');
-            const currentPosRow = $('.tileP').data('row');
+            const currentPosCol = player.col;
+            const currentPosRow = player.row;
             const hero = $('.tileP');
             let newPos;
             let newPosTile;
@@ -164,6 +169,8 @@ class Game {
                         `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
                     );
 
+                    player.row = newPos;
+
                     player.move(hero, newPosTile);
 
                     break;
@@ -187,6 +194,8 @@ class Game {
                     newPosTile = $(
                         `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
                     );
+
+                    player.col = newPos;
 
                     player.move(hero, newPosTile);
 
@@ -212,6 +221,8 @@ class Game {
                         `.tile[data-col=${currentPosCol}][data-row=${newPos}]`
                     );
 
+                    player.row = newPos;
+
                     player.move(hero, newPosTile);
 
                     break;
@@ -235,6 +246,8 @@ class Game {
                     newPosTile = $(
                         `.tile[data-col=${newPos}][data-row=${currentPosRow}]`
                     );
+
+                    player.col = newPos;
 
                     player.move(hero, newPosTile);
 
