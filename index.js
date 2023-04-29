@@ -218,7 +218,7 @@ class Game {
         placeObject('swords');
         placeObject('health');
         placeObject('hero');
-        placeObject('enemies');
+        // placeObject('enemies');
 
         $(document).keydown((e) => {
             const currentPosCol = player.col;
@@ -341,14 +341,22 @@ class Game {
 }
 
 const createRoom = () => {
-    for (let i = 0; i < Math.floor(Math.random() * 6) + 5; i++) {
-        const randomCol = Math.floor(Math.random() * cols);
-        const randomRow = Math.floor(Math.random() * rows);
+    for (let k = 0; k < Math.floor(Math.random() * 6) + 5; k++) {
+        let randomCol = Math.floor(Math.random() * cols);
+        let randomRow = Math.floor(Math.random() * rows);
         const randomWidth = Math.floor(Math.random() * (5 + 1)) + 3;
         const randomHeight = Math.floor(Math.random() * (5 + 1)) + 3;
 
-        for (let i = randomRow; i < randomHeight + randomRow; i++) {
-            for (let j = randomCol; j < randomWidth + randomCol; j++) {
+        if (randomCol + randomWidth > cols) {
+            randomCol = randomCol - (randomCol + randomWidth - (cols - 1));
+        }
+
+        if (randomRow + randomHeight > rows) {
+            randomRow = randomRow - (randomRow + randomHeight - (rows - 1));
+        }
+
+        for (let i = randomRow + 1; i < randomHeight + randomRow + 1; i++) {
+            for (let j = randomCol + 1; j < randomWidth + randomCol + 1; j++) {
                 $(`.tile[data-col=${j}][data-row=${i}]`).removeClass('tileW');
             }
         }
