@@ -370,11 +370,8 @@ const createPasses = (type) => {
     let startsWidth = 0;
     let gaps = 0;
 
-    let typeArray = [];
     switch (type) {
         case 'col':
-            typeArray = colsArray;
-
             switch (randomPasses) {
                 case 3:
                     startsWidth = 4;
@@ -391,8 +388,6 @@ const createPasses = (type) => {
             }
             break;
         case 'row':
-            typeArray = rowsArray;
-
             switch (randomPasses) {
                 case 3:
                     startsWidth = 1;
