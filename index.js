@@ -218,7 +218,7 @@ class Game {
         placeObject('swords');
         placeObject('health');
         placeObject('hero');
-        // placeObject('enemies');
+        placeObject('enemies');
 
         $(document).keydown((e) => {
             const currentPosCol = player.col;
@@ -365,36 +365,53 @@ const createRoom = () => {
 
 const createPasses = (type) => {
     const randomPasses = Math.floor(Math.random() * 3) + 3;
-    const passArray = [];
-    let passArrayLength = 0;
+    console.log(`${type}: ${randomPasses} `);
+
+    let startsWidth = 0;
+    let gaps = 0;
 
     let typeArray = [];
     switch (type) {
         case 'col':
             typeArray = colsArray;
+
+            switch (randomPasses) {
+                case 3:
+                    startsWidth = 4;
+                    gaps = 5;
+                    break;
+                case 4:
+                    startsWidth = 2;
+                    gaps = 5;
+                    break;
+                case 5:
+                    startsWidth = 1;
+                    gaps = 4;
+                    break;
+            }
             break;
         case 'row':
             typeArray = rowsArray;
+
+            switch (randomPasses) {
+                case 3:
+                    startsWidth = 1;
+                    gaps = 4;
+                    break;
+                case 4:
+                    startsWidth = 1;
+                    gaps = 3;
+                    break;
+                case 5:
+                    startsWidth = 2;
+                    gaps = 2;
+                    break;
+            }
             break;
     }
 
-    while (passArrayLength != randomPasses) {
-        const randomPass =
-            typeArray[Math.floor(Math.random() * typeArray.length)];
-
-        if (
-            passArray.includes(randomPass) ||
-            passArray.includes(randomPass + 1) ||
-            passArray.includes(randomPass - 1)
-        )
-            continue;
-
-        passArray.push(randomPass);
-        passArrayLength++;
-    }
-
-    for (let i = 0; i < passArray.length; i++) {
-        $(`.tile[data-${type}=${passArray[i]}]`).removeClass('tileW');
+    for (let i = startsWidth; i <= randomPasses * gaps; i += gaps) {
+        $(`.tile[data-${type}=${i}]`).removeClass('tileW');
     }
 };
 
