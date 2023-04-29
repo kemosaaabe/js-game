@@ -126,7 +126,7 @@ class Hero {
     }
 
     attack(currentPosCol, currentPosRow) {
-        if (!this.HP) return;
+        if (this.HP <= 0) return;
 
         const heroTilesAround = [
             $(
@@ -169,7 +169,7 @@ class Hero {
     }
 
     move(heroTile, newPosTile) {
-        if (!this.HP) return;
+        if (this.HP <= 0) return;
         $(heroTile).empty();
 
         $(heroTile).removeClass('tileP');
@@ -342,13 +342,13 @@ class Game {
 
 const createRoom = () => {
     for (let i = 0; i < Math.floor(Math.random() * 6) + 5; i++) {
-        const randomCol = Math.floor(Math.random() * (cols + 1));
-        const randomRow = Math.floor(Math.random() * (rows + 1));
+        const randomCol = Math.floor(Math.random() * cols);
+        const randomRow = Math.floor(Math.random() * rows);
         const randomWidth = Math.floor(Math.random() * (5 + 1)) + 3;
         const randomHeight = Math.floor(Math.random() * (5 + 1)) + 3;
 
-        for (let i = randomRow + 1; i < randomHeight + randomRow; i++) {
-            for (let j = randomCol + 1; j < randomWidth + randomCol; j++) {
+        for (let i = randomRow; i < randomHeight + randomRow; i++) {
+            for (let j = randomCol; j < randomWidth + randomCol; j++) {
                 $(`.tile[data-col=${j}][data-row=${i}]`).removeClass('tileW');
             }
         }
