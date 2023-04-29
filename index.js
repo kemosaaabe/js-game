@@ -365,7 +365,6 @@ const createRoom = () => {
 
 const createPasses = (type) => {
     const randomPasses = Math.floor(Math.random() * 3) + 3;
-    console.log(`${type}: ${randomPasses} `);
 
     let startsWidth = 0;
     let gaps = 0;
